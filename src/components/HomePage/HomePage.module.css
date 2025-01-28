@@ -1,0 +1,57 @@
+.container {
+    min-height: 100vh;
+    background-color: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  
+  .logo {
+    position: absolute;
+    top: 50px;
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+  }
+  
+  .titleContainer {
+    display: flex;
+    align-items: center;
+    margin-bottom: 40px;
+  }
+  
+  .matchText {
+    color: #FFFFFF;
+    font-size: 36px;
+    font-weight: 700;
+    margin-right: 10px;
+  }
+  
+  .aiText {
+    color: #6EACFE;
+    font-size: 36px;
+    font-weight: 700;
+  }
+  
+  .gradientBorder {
+    background: linear-gradient(135deg, #AF53FF 0%, #6EACFE 100%);
+    border-radius: 10px;
+    padding: 2px;
+  }
+  
+  .startButton {
+    background: #000000;
+    border: none;
+    border-radius: 8px;
+    padding: 16px 45px;
+    cursor: pointer;
+  }
+  
+  .startText {
+    color: #6EACFE;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
