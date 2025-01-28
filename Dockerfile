@@ -1,5 +1,5 @@
 # Этап сборки
-FROM node:16 as build
+FROM node:20.18.2 AS build
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
@@ -10,15 +10,8 @@ COPY package*.json ./
 # Устанавливаем зависимости
 RUN npm install
 
-# Устанавливаем react-scripts глобально для текущего пользователя
-RUN npm install -g react-scripts
-
 # Копируем исходный код
 COPY . .
-
-# Даем права на выполнение скриптов
-RUN chmod +x node_modules/.bin/react-scripts && \
-    chmod -R 777 node_modules/.bin/
 
 # Выполняем сборку
 RUN npm run build
@@ -26,12 +19,14 @@ RUN npm run build
 # Этап production
 FROM nginx:alpine
 
-# Копируем собранные файлы
+# Копируем собранные файлы из предыдущего этапа
 COPY --from=build /app/build /usr/share/nginx/html
 
 # Копируем конфигурацию nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
+# Указываем порт, который будет прослушиваться
 EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"] 
+# Запускаем Nginx в фореин режиме
+CMD ["nginx", "-g", "daemon off;"]
