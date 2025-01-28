@@ -1,9 +1,17 @@
 # Этап сборки
-FROM node:16-alpine as build
+FROM node:16 as build
 WORKDIR /app
+
+# Копируем файлы package.json и package-lock.json
 COPY package*.json ./
+
+# Устанавливаем зависимости
 RUN npm install
+
+# Копируем исходный код
 COPY . .
+
+# Выполняем сборку
 RUN npm run build
 
 # Этап production
