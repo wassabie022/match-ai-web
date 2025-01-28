@@ -2,23 +2,23 @@
 FROM node:16 as build
 
 # Устанавливаем рабочую директорию
-WORKDIR /opt/build
+WORKDIR /app
 
 # Копируем package.json и package-lock.json
 COPY package*.json ./
 
-# Устанавливаем зависимости с правами root
-RUN npm install -g react-scripts && npm install
+# Устанавливаем зависимости
+RUN npm install
+
+# Устанавливаем react-scripts глобально для текущего пользователя
+RUN npm install -g react-scripts
 
 # Копируем исходный код
 COPY . .
 
-# Устанавливаем права на директорию
-RUN chown -R node:node /opt/build && \
-    chmod -R 755 /opt/build
-
-# Переключаемся на пользователя node
-USER node
+# Даем права на выполнение скриптов
+RUN chmod +x node_modules/.bin/react-scripts && \
+    chmod -R 777 node_modules/.bin/
 
 # Выполняем сборку
 RUN npm run build
@@ -27,14 +27,10 @@ RUN npm run build
 FROM nginx:alpine
 
 # Копируем собранные файлы
-COPY --from=build /opt/build/build /var/www/build
+COPY --from=build /app/build /usr/share/nginx/html
 
 # Копируем конфигурацию nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Устанавливаем права на файлы nginx
-RUN chown -R nginx:nginx /var/www/build && \
-    chmod -R 755 /var/www/build
 
 EXPOSE 80
 
