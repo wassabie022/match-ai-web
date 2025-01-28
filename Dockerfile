@@ -2,39 +2,34 @@
 FROM node:20.18.2 AS build
 
 # Устанавливаем рабочую директорию
-WORKDIR /opt/build
+WORKDIR /app
 
 # Копируем package.json и package-lock.json
 COPY package*.json ./
 
-# Устанавливаем зависимости и react-scripts глобально
-RUN npm install -g react-scripts && \
-    npm install
+# Устанавливаем зависимости чисто
+RUN npm ci
+
+# Обеспечиваем, что все бинарные файлы в node_modules/.bin имеют права на выполнение
+RUN find ./node_modules/.bin -type f -exec chmod +x {} \;
 
 # Копируем исходный код
 COPY . .
 
-# Устанавливаем правильные права
-RUN chmod -R 777 /opt/build/node_modules/.bin/ && \
-    chown -R node:node /opt/build
-
-# Переключаемся на пользователя node
-USER node
-
-# Выполняем сборку с явным путем к react-scripts
-RUN /opt/build/node_modules/.bin/react-scripts build
+# Выполняем сборку приложения
+RUN npm run build
 
 # Этап production
 FROM nginx:alpine
 
 # Копируем собранные файлы из предыдущего этапа
-COPY --from=build /opt/build/build /usr/share/nginx/html
+COPY --from=build /app/build /usr/share/nginx/html
 
 # Копируем конфигурацию nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Указываем порт
+# Указываем порт, который будет прослушиваться
 EXPOSE 80
 
-# Запускаем Nginx
+# Запускаем Nginx в форграунд режиме
 CMD ["nginx", "-g", "daemon off;"]
